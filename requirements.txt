@@ -4,4 +4,8 @@ langchain-ollama
 duckduckgo-search
 gTTS
 pydub
+pyaudio==0.2.14
 requests
+vosk
+SpeechRecognition
+sounddevice
