@@ -1,7 +1,14 @@
 langchain
 langchain-community
 langchain-ollama
+langchain_hub
+chromadb
+sentence-transformers
 duckduckgo-search
+youtube_search
+wikipedia
+pypdf
+pickle5
 gTTS
 pydub
 pyaudio==0.2.14
