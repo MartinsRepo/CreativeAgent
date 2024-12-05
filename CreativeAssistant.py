@@ -6,6 +6,7 @@ from langchain_community.vectorstores import Chroma
 from langchain_ollama import OllamaLLM
 from langchain_community.tools import WikipediaQueryRun
 from langchain_community.utilities import WikipediaAPIWrapper
+from langchain_core.prompts import ChatPromptTemplate
 import pickle
 import json
 import vosk
@@ -92,12 +93,18 @@ def create_tools(retrieval_chain, model, memory):
     return retrieval_tool, agent
 
 # %%
+# Create prompt template for conversation
+chat_template = ChatPromptTemplate.from_messages(
+    [
+        ("system", "You are an AI assistant specialized in artificial intelligence, robotics, and automotive technology."),
+        ("human", "How can I assist you today?"),
+        ("ai", "I'm here to help you with anything related to AI, robotics, or automotive technology!"),
+        ("human", "{user_input}"),
+    ]
+)
+
 # Start a conversation with the agent
 def start_conversation(agent, memory):
-    
-    assistant_intro = """You are an AI assistant specialized in artificial intelligence, robotics, and automotive technology. \
-    Your job is to help generate maximum of three creative ideas and answer questions on these topics. Use the latest research and trends in your responses.\nExplain exactly three ideas and make your answer short. Stop after the answer.\n\nQuestion: """
-
     print("Agent: How can I help you? Type 'exit' to end the conversation.")
     conversation_history = []
     while True:
@@ -108,14 +115,15 @@ def start_conversation(agent, memory):
                 pickle.dump(memory, f)
             break
         
-        # Modify prompt and add user input
-        modified_prompt = assistant_intro + user_input
-
-        # Agent processes user input
-        response = agent.invoke(modified_prompt)
-
-        # Print agent's response
-        print(f"Agent: {response}")
+        # Format chat prompt with user input
+        messages = chat_template.format_messages(user_input=user_input)
+       
+        # Agent processes user input using stream method
+        response = ""
+        for chunk in agent.stream(messages):
+            response += chunk['choices'][0]['delta'].get('content', '')
+            print(chunk['choices'][0]['delta'].get('content', ''), end="", flush=True)
+        print()  # Print a newline after the response
 
 
 # %%
