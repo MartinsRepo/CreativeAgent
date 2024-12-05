@@ -21,7 +21,7 @@ def initialisation():
     language = 'en'
     
     # Load the LLaMA 3.2 model from Ollama backend
-    model = OllamaLLM(model='llama3.2', , temperature=0.9)
+    model = OllamaLLM(model='llama3.2', temperature=0.9)
     
     # Load the Vosk model
     #modelvoice = vosk.Model(lang="en-us")    
