@@ -7,6 +7,7 @@ from langchain_ollama import OllamaLLM
 from langchain_community.tools import WikipediaQueryRun
 from langchain_community.utilities import WikipediaAPIWrapper
 from langchain_core.prompts import ChatPromptTemplate
+from langchain.output_parsers import TextOutputParser
 import pickle
 import json
 import vosk
@@ -124,6 +125,15 @@ def start_conversation(agent, memory):
             response += chunk['choices'][0]['delta'].get('content', '')
             print(chunk['choices'][0]['delta'].get('content', ''), end="", flush=True)
         print()  # Print a newline after the response
+
+        # Parse the response to text
+        parsed_response = output_parser.parse(response)
+        
+        # Convert the parsed response to speech
+        tts = gTTS(text=parsed_response, lang='en')
+        tts.save("response.mp3")
+        audio = AudioSegment.from_mp3("response.mp3")
+        play(audio)
 
 
 # %%
